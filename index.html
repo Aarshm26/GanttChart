@@ -2,361 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gantt Chart Creator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            color: #333;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .results {
-            margin-top: 20px;
-        }
-        .gantt-chart {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        .gantt-chart div {
-            border: 1px solid #007bff;
-            background-color: #cce5ff;
-            padding: 10px;
-            text-align: center;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-            flex-grow: 1;
-            flex-basis: 0;
-        }
-        .metrics {
-            margin-top: 20px;
-        }
-        .error {
-            color: red;
-            margin-top: 10px;
-            display: none;
-        }
-    </style>
+    <title>OS Scheduling Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1 align="center"> Gantt Chart for implementation of preemptive and non-preemptive scheduling algorithms</h1>
-    <hr color="black">
     <div class="container">
-        <h1>Gantt Chart Creator</h1>
-        <div class="form-group">
-            <label for="processes">Enter Process Times (comma-separated):</label>
-            <input type="text" id="processes" placeholder="e.g. 5,8,1,3">
-        </div>
-        <div class="form-group">
-            <label for="priorities">Enter Priorities (comma-separated, optional for Priority Scheduling):</label>
-            <input type="text" id="priorities" placeholder="e.g. 2,1,4,3">
-        </div>
-        <div class="form-group">
-            <label for="timeQuantum">Enter Time Quantum (only for RR):</label>
-            <input type="text" id="timeQuantum" placeholder="e.g. 2">
-        </div>
-        <div class="form-group">
-            <label for="preemptive">Select Preemptive or Non-Preemptive:</label>
-            <select id="preemptive">
-                <option value="non-preemptive">Non-Preemptive</option>
-                <option value="preemptive">Preemptive</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="algorithm">Select Scheduling Algorithm:</label>
-            <select id="algorithm">
-                <option value="fcfs">First Come First Serve (FCFS)</option>
-                <option value="sjf">Shortest Job First (SJF)</option>
-                <option value="rr">Round Robin (RR)</option>
-                <option value="priority">Priority Scheduling</option>
-            </select>
-        </div>
-        <button onclick="generateGanttChart()">Generate Gantt Chart</button>
-        <div id="results" class="results">
-            <h2>Results</h2>
-            <div id="ganttChart" class="gantt-chart"></div>
-            <div id="metrics" class="metrics"></div>
-        </div>
-        <p id="error" class="error">Please enter valid inputs.</p>
+        <header class="header">
+            <h1>Gantt Chart Implementation</h1>
+            <p class="subtitle"> CPU scheduling algorithms with Gantt charts</p>
+        </header>
+
+        <section class="input-section">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="processes">Process Burst Times</label>
+                    <input type="text" id="processes" placeholder="e.g. 5,8,1,3" required>
+                    <span class="input-hint">Comma-separated values</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="arrivalTimes">Arrival Times</label>
+                    <input type="text" id="arrivalTimes" placeholder="e.g. 0,1,3,4">
+                    <span class="input-hint">Default: 0 for all processes</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="priorities">Priorities</label>
+                    <input type="text" id="priorities" placeholder="e.g. 2,1,4,3">
+                    <span class="input-hint">Lower number = higher priority</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="timeQuantum">Time Quantum</label>
+                    <input type="number" id="timeQuantum" min="1" value="2">
+                    <span class="input-hint">For Round Robin only</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="algorithm">Scheduling Algorithm</label>
+                    <select id="algorithm">
+                        <option value="fcfs">FCFS (First Come First Serve)</option>
+                        <option value="sjf">SJF (Shortest Job First)</option>
+                        <option value="srtf">SRTF (Shortest Remaining Time First)</option>
+                        <option value="rr">Round Robin</option>
+                        <option value="priority-np">Priority (Non-Preemptive)</option>
+                        <option value="priority-p">Priority (Preemptive)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="visualize-btn" onclick="calculateSchedule()">
+                <span class="btn-text">Generate Schedule</span>
+            </button>
+        </section>
+
+        <section class="output-section">
+            <div class="error-msg" id="error"></div>
+            
+            <div class="gantt-section">
+                <h2>Gantt Chart</h2>
+                <div class="gantt-chart" id="ganttChart"></div>
+            </div>
+
+            <div class="metrics-section">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Average Waiting Time</h3>
+                        <p class="metric-value" id="avgWaiting">0.00</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Average Turnaround Time</h3>
+                        <p class="metric-value" id="avgTurnaround">0.00</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Total Processes</h3>
+                        <p class="metric-value" id="totalProcesses">0</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="process-table-section">
+                <h2>Process Details</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Process</th>
+                            <th>Burst Time</th>
+                            <th>Arrival Time</th>
+                            <th>Priority</th>
+                            <th>Waiting Time</th>
+                            <th>Turnaround Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processTableBody"></tbody>
+                </table>
+            </div>
+
+        </section>
     </div>
-    <script>
-        function generateGanttChart() {
-            const processTimes = document.getElementById('processes').value.split(',').map(Number);
-            const priorities = document.getElementById('priorities').value.split(',').map(Number);
-            const timeQuantum = parseInt(document.getElementById('timeQuantum').value, 10);
-            const algorithm = document.getElementById('algorithm').value;
-            const preemptive = document.getElementById('preemptive').value === 'preemptive';
-            const errorElement = document.getElementById('error');
 
-            if (processTimes.some(isNaN) || (algorithm === 'rr' && isNaN(timeQuantum))) {
-                errorElement.style.display = 'block';
-                return;
-            }
-            errorElement.style.display = 'none';
-
-            let chartData;
-            if (algorithm === 'fcfs') {
-                chartData = fcfs(processTimes);
-            } else if (algorithm === 'sjf') {
-                chartData = preemptive ? sjfPreemptive(processTimes) : sjfNonPreemptive(processTimes);
-            } else if (algorithm === 'rr') {
-                chartData = rr(processTimes, timeQuantum);
-            } else if (algorithm === 'priority') {
-                chartData = preemptive ? prioritySchedulingPreemptive(processTimes, priorities) : prioritySchedulingNonPreemptive(processTimes, priorities);
-            }
-
-            displayGanttChart(chartData);
-        }
-
-        function fcfs(processTimes) {
-            const n = processTimes.length;
-            let currentTime = 0;
-            let ganttData = [];
-            let waitingTimes = [];
-            let responseTimes = [];
-
-            for (let i = 0; i < n; i++) {
-                ganttData.push({ process: `P${i + 1}`, start: currentTime, duration: processTimes[i] });
-                waitingTimes.push(currentTime);
-                responseTimes.push(currentTime);
-                currentTime += processTimes[i];
-            }
-
-            return { ganttData, waitingTimes, responseTimes };
-        }
-
-        function sjfNonPreemptive(processTimes) {
-            const n = processTimes.length;
-            let currentTime = 0;
-            let ganttData = [];
-            let waitingTimes = [];
-            let responseTimes = [];
-            let sortedProcesses = processTimes.map((time, index) => ({ time, index })).sort((a, b) => a.time - b.time);
-
-            sortedProcesses.forEach(({ time, index }) => {
-                ganttData.push({ process: `P${index + 1}`, start: currentTime, duration: time });
-                waitingTimes.push(currentTime);
-                responseTimes.push(currentTime);
-                currentTime += time;
-            });
-
-            return { ganttData, waitingTimes, responseTimes };
-        }
-
-        function sjfPreemptive(processTimes) {
-            const n = processTimes.length;
-            let currentTime = 0;
-            let ganttData = [];
-            let waitingTimes = new Array(n).fill(0);
-            let responseTimes = new Array(n).fill(-1);
-            let remainingTimes = [...processTimes];
-            let completed = 0;
-            let prevProcess = -1;
-
-            while (completed < n) {
-                let shortest = -1;
-                let minTime = Infinity;
-
-                for (let i = 0; i < n; i++) {
-                    if (remainingTimes[i] > 0 && remainingTimes[i] < minTime) {
-                        minTime = remainingTimes[i];
-                        shortest = i;
-                    }
-                }
-
-                if (shortest === -1) {
-                    currentTime++;
-                    continue;
-                }
-
-                if (responseTimes[shortest] === -1) {
-                    responseTimes[shortest] = currentTime;
-                }
-
-                ganttData.push({ process: `P${shortest + 1}`, start: currentTime, duration: 1 });
-                remainingTimes[shortest]--;
-                currentTime++;
-
-                if (remainingTimes[shortest] === 0) {
-                    completed++;
-                    waitingTimes[shortest] = currentTime - processTimes[shortest];
-                }
-
-                prevProcess = shortest;
-            }
-
-            return { ganttData, waitingTimes, responseTimes };
-        }
-
-        function rr(processTimes, timeQuantum) {
-            const n = processTimes.length;
-            let currentTime = 0;
-            let ganttData = [];
-            let waitingTimes = new Array(n).fill(0);
-            let responseTimes = new Array(n).fill(-1);
-            let remainingTimes = [...processTimes];
-            let queue = [];
-
-            for (let i = 0; i < n; i++) {
-                queue.push(i);
-            }
-
-            while (queue.length > 0) {
-                let i = queue.shift();
-                if (responseTimes[i] === -1) {
-                    responseTimes[i] = currentTime;
-                }
-                if (remainingTimes[i] > timeQuantum) {
-                    ganttData.push({ process: `P${i + 1}`, start: currentTime, duration: timeQuantum });
-                    currentTime += timeQuantum;
-                    remainingTimes[i] -= timeQuantum;
-                    queue.push(i);
-                } else {
-                    ganttData.push({ process: `P${i + 1}`, start: currentTime, duration: remainingTimes[i] });
-                    currentTime += remainingTimes[i];
-                    waitingTimes[i] = currentTime - processTimes[i];
-                    remainingTimes[i] = 0;
-                }
-            }
-
-            return { ganttData, waitingTimes, responseTimes };
-        }
-
-        function prioritySchedulingNonPreemptive(processTimes, priorities) {
-            const n = processTimes.length;
-            let currentTime = 0;
-            let ganttData = [];
-            let waitingTimes = [];
-            let responseTimes = [];
-            let sortedProcesses = processTimes.map((time, index) => ({
-                time,
-                index,
-                priority: priorities[index]
-            })).sort((a, b) => a.priority - b.priority);
-
-            sortedProcesses.forEach(({ time, index }) => {
-                ganttData.push({ process: `P${index + 1}`, start: currentTime, duration: time });
-                waitingTimes.push(currentTime);
-                responseTimes.push(currentTime);
-                currentTime += time;
-            });
-
-            return { ganttData, waitingTimes, responseTimes };
-        }
-
-        function prioritySchedulingPreemptive(processTimes, priorities) {
-            const n = processTimes.length;
-            let currentTime = 0;
-            let ganttData = [];
-            let waitingTimes = new Array(n).fill(0);
-            let responseTimes = new Array(n).fill(-1);
-            let remainingTimes = [...processTimes];
-            let completed = 0;
-
-            while (completed < n) {
-                let highestPriority = -1;
-                let minPriority = Infinity;
-
-                for (let i = 0; i < n; i++) {
-                    if (remainingTimes[i] > 0 && priorities[i] < minPriority) {
-                        minPriority = priorities[i];
-                        highestPriority = i;
-                    }
-                }
-
-                if (highestPriority === -1) {
-                    currentTime++;
-                    continue;
-                }
-
-                if (responseTimes[highestPriority] === -1) {
-                    responseTimes[highestPriority] = currentTime;
-                }
-
-                ganttData.push({ process: `P${highestPriority + 1}`, start: currentTime, duration: 1 });
-                remainingTimes[highestPriority]--;
-                currentTime++;
-
-                if (remainingTimes[highestPriority] === 0) {
-                    completed++;
-                    waitingTimes[highestPriority] = currentTime - processTimes[highestPriority];
-                }
-            }
-
-            return { ganttData, waitingTimes, responseTimes };
-        }
-
-        function displayGanttChart(chartData) {
-            const { ganttData, waitingTimes, responseTimes } = chartData;
-            const ganttChart = document.getElementById('ganttChart');
-            const metrics = document.getElementById('metrics');
-
-            ganttChart.innerHTML = '';
-            metrics.innerHTML = '';
-
-            ganttData.forEach(({ process, start, duration }) => {
-                const div = document.createElement('div');
-                div.style.width = `${duration * 30}px`;
-                div.innerHTML = `${process} (${start} - ${start + duration})`;
-                ganttChart.appendChild(div);
-            });
-
-            const avgWaitingTime = waitingTimes.reduce((a, b) => a + b, 0) / waitingTimes.length;
-            const avgResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
-
-            metrics.innerHTML = `
-                <p><strong>Average Waiting Time:</strong> ${avgWaitingTime.toFixed(2)}</p>
-                <p><strong>Average Response Time:</strong> ${avgResponseTime.toFixed(2)}</p>
-            `;
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
